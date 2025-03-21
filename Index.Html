@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiet Coffee Place</title>
+    <style>
+        :root {
+            --verde-primario: #2e7d32;
+            --verde-secundario: #388e3c;
+            --fondo: #e8f5e9;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--fondo);
+            color: #1b5e20;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: var(--verde-primario);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .productos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+        .producto {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid #c8e6c9;
+        }
+        .producto:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .producto img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .precio {
+            color: var(--verde-secundario);
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        button {
+            background-color: var(--verde-primario);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+        .carrito {
+            background: white;
+            margin: 2rem;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        #lista-carrito li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .qr-transfermovil {
+            width: 150px;
+            height: 150px;
+            margin: 1rem 0;
+            border: 2px solid var(--verde-primario);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌿 Quiet Coffee Place</h1>
+        <p>Productos ecológicos y de la mejor calidad</p>
+    </header>
+    <section class="productos">
+        <div class="producto">
+            <img src="images/arroz.jpg" alt="Arroz">
+            <h2>Arroz Orgánico</h2>
+            <p class="precio">200 CUP/libra</p>
+            <button onclick="añadirAlCarrito('Arroz', 200)">Añadir al carrito</button>
+        </div>
+        <div class="producto">
+            <img src="images/cafe.jpg" alt="Café">
+            <h2>Café Premium</h2>
+            <p class="precio">1200 CUP/paquete</p>
+            <button onclick="añadirAlCarrito('Café', 1200)">Añadir al carrito</button>
+        </div>
+        <div class="producto">
+            <img src="images/azucar.jpg" alt="Azúcar">
+            <h2>Azúcar Natural</h2>
+            <p class="precio">500 CUP/paquete</p>
+            <button onclick="añadirAlCarrito('Azúcar', 500)">Añadir al carrito</button>
+        </div>
+        <div class="producto">
+            <img src="images/galletas.jpg" alt="Galletas">
+            <h2>Galletas María</h2>
+            <p class="precio">350 CUP/paquete</p>
+            <button onclick="añadirAlCarrito('Galletas', 350)">Añadir al carrito</button>
+        </div>
+    </section>
+    <section class="carrito">
+        <h2>🛒 Tu Carrito</h2>
+        <ul id="lista-carrito"></ul>
+        <p>Total: <span id="total-carrito">0</span> CUP</p>
+        <button onclick="vaciarCarrito()">Vaciar carrito</button>
+    </section>
+    <section class="pago">
+        <h2>💳 Pago con Transfermóvil</h2>
+        <div>
+            <p>📱 Número: <strong>12345678</strong></p>
+            <img src="images/qr-transfermovil.png" class="qr-transfermovil" alt="Código QR">
+        </div>
+        <form id="formulario-pago">
+            <input type="text" placeholder="Número de comprobante" required>
+            <button type="submit">Confirmar pago</button>
+        </form>
+    </section>
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        function actualizarCarrito() {
+            const lista = document.getElementById('lista-carrito');
+            const total = document.getElementById('total-carrito');
+            lista.innerHTML = '';
+            let totalCalculado = 0;
+            carrito.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `${item.nombre} <span>${item.precio} CUP</span> <button onclick="eliminarItem(${index})">🗑️</button>`;
+                lista.appendChild(li);
+                totalCalculado += item.precio;
+            });
+            total.textContent = totalCalculado;
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+        }
+        function añadirAlCarrito(nombre, precio) {
+            carrito.push({ nombre, precio });
+            actualizarCarrito();
+            alert(`✅ ${nombre} añadido al carrito`);
+        }
+        function eliminarItem(index) {
+            carrito.splice(index, 1);
+            actualizarCarrito();
+        }
+        function vaciarCarrito() {
+            carrito = [];
+            actualizarCarrito();
+        }
+        document.getElementById('formulario-pago').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('📄 Comprobante recibido. ¡Gracias por tu compra!');
+            vaciarCarrito();
+        });
+        actualizarCarrito();
+    </script>
+</body>
+</html>
